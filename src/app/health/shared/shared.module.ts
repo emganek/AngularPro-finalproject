@@ -1,16 +1,21 @@
 import { ModuleWithProviders, NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { MealsModule } from '../meals/containers/meals.module';
 import { MealsService } from './services/meals/meals.service';
+import { ListItemComponent } from './components/list-item/list-item.component';
 
 
 
 @NgModule({
-  declarations: [],
+  declarations: [
+    ListItemComponent
+  ],
   imports: [
     CommonModule,
     RouterModule,
+  ],
+  exports:[
+    ListItemComponent
   ]
 })
 export class SharedModule {
@@ -18,7 +23,6 @@ export class SharedModule {
     return {
       ngModule: SharedModule,
       providers: [
-        MealsModule,
         MealsService
       ]
     }

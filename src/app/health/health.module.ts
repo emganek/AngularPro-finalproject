@@ -29,6 +29,6 @@ export const ROUTES: Routes = [
     CommonModule,
     RouterModule.forChild(ROUTES),
     SharedModule.forRoot(),
-  ]
+  ],
 })
 export class HealthModule { }
