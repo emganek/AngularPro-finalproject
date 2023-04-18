@@ -3,7 +3,8 @@ import { State } from "./state.model";
 
 const state: State = {
     user: undefined,
-    meals: undefined!
+    meals: undefined!,
+    workouts: undefined!
 }
 
 export class Store {

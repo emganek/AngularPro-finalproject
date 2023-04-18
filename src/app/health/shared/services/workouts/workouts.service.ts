@@ -5,15 +5,19 @@ import { fireDatabase } from 'src/app/app.module';
 import { AuthService } from 'src/app/auth/shared/services/auth.service';
 import { Store } from 'src/app/store';
 
-export interface Meal {
+export interface Workout {
   name?: string,
-  ingredients?: string[],
+  type?: string,
+  strength?: any,
+  endurance?: any,
   timestamp?: number,
   $key?: string,
 }
 
-@Injectable()
-export class MealsService {
+@Injectable({
+  providedIn: 'root'
+})
+export class WorkoutsService {
 
   constructor(private store: Store, private authService: AuthService) {
   }
@@ -22,46 +26,46 @@ export class MealsService {
     return this.authService.user?.uid
   }
 
-  getMeals() {
-    const dbRef = ref(fireDatabase, `meals/${this.uid}`);
+  getWorkouts() {
+    const dbRef = ref(fireDatabase, `workouts/${this.uid}`);
     return onValue(dbRef, (snapshot) => {
       if (!snapshot.exists()) {
-        this.store.set('meals', []);
+        this.store.set('workouts', []);
       } else {
-        let tempArr: Meal[] = [];
+        let tempArr: Workout[] = [];
         snapshot.forEach((ele: any) => {
           const item = { ...ele.val(), $key: ele.key }
           tempArr.push(item);
         });
         console.log("tempArr", tempArr)
-        this.store.set('meals', tempArr);
+        this.store.set('workouts', tempArr);
       }
     }, {
       onlyOnce: false
     });
   }
 
-  addMeal(meal: Meal) {
-    const postListRef = ref(fireDatabase, `meals/${this.uid}`);
+  addWorkout(workout: Workout) {
+    const postListRef = ref(fireDatabase, `workouts/${this.uid}`);
     const newPostRef = push(postListRef);
-    return set(newPostRef, meal);
+    return set(newPostRef, workout);
   }
 
-  updateMeal(key:string, meal:Meal){
-    const postListRef = ref(fireDatabase, `meals/${this.uid}/${key}`);
-    return update(postListRef, meal);
+  updateWorkout(key: string, workout: Workout) {
+    const postListRef = ref(fireDatabase, `workouts/${this.uid}/${key}`);
+    return update(postListRef, workout);
   }
 
-  removeMeal(key: string) {
-    const postListRef = ref(fireDatabase, `meals/${this.uid}/${key}`);
+  removeWorkout(key: string) {
+    const postListRef = ref(fireDatabase, `workouts/${this.uid}/${key}`);
     return remove(postListRef);
   }
 
-  getMeal(key: any) {
-    if (!key) return of({} as Meal);
-    return this.store.select<Meal[]>('meals').pipe(
+  getWorkout(key: any) {
+    if (!key) return of({} as Workout);
+    return this.store.select<Workout[]>('workouts').pipe(
       filter(Boolean),
-      map(meals => meals.find((meal: Meal) => meal.$key === key))
+      map(workouts => workouts.find((workout: Workout) => workout.$key === key))
     )
   }
 }
