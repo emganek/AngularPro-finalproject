@@ -6,6 +6,7 @@ const state: State = {
     meals: undefined!,
     schedule: undefined!,
     selected: undefined!,
+    list: undefined!,
     workouts: undefined!,
     date: undefined!,
 }

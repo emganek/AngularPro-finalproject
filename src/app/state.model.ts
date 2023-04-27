@@ -10,5 +10,6 @@ export interface State{
     date: Date,
     schedule: ScheduleItem[],
     selected:any,
+    list:any,
     [key:string]: any;
 }

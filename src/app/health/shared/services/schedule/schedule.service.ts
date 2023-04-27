@@ -35,6 +35,11 @@ export class ScheduleService {
     tap((next: any) => this.store.set('selected', next))
   );
 
+  list$ = this.section$.pipe(
+    map((value: any) => this.store.value[value.type]),
+    tap((next: any) => this.store.set('list', next))
+  );
+
   schedule$: any = this.date$.pipe(
     tap((next: any) => {
       this.store.set('date', next);
@@ -82,7 +87,7 @@ export class ScheduleService {
       onValue(myquery, (snapshot) => {
         if (!snapshot.exists()) {
           console.log("ressultttt", snapshot.val());
-          resolve(snapshot.val()=== null ? [] : snapshot.val());
+          resolve(snapshot.val() === null ? [] : snapshot.val());
         } else {
           resolve([]);
         }

@@ -8,6 +8,7 @@ import { ScheduleDaysComponent } from '../components/schedule-days/schedule-days
 import { ScheduleControlsComponent } from '../components/schedule-controls/schedule-controls.component';
 import { ScheduleSectionComponent } from '../components/schedule-section/schedule-section.component';
 import { SharedModule } from '../../shared/shared.module';
+import { ScheduleAssignComponent } from '../components/schedule-assign/schedule-assign.component';
 
 export const ROUTES:Routes = [
   {
@@ -17,7 +18,7 @@ export const ROUTES:Routes = [
 
 
 @NgModule({
-  declarations: [SchedulesComponent, ScheduleCalendarComponent, ScheduleDaysComponent, ScheduleControlsComponent, ScheduleSectionComponent],
+  declarations: [SchedulesComponent, ScheduleCalendarComponent, ScheduleDaysComponent, ScheduleControlsComponent, ScheduleSectionComponent, ScheduleAssignComponent],
   imports: [
     CommonModule,
     ReactiveFormsModule,
