@@ -1,1 +1,10 @@
-<p>schedules works!</p>
+<div class="schedule">
+      
+    <schedule-calendar
+      [date]="(date$ | async)!"
+      [items]="(schedule$ | async)!"
+      (change)="changeDate($event)"
+      (select)="changeSection($event)">
+    </schedule-calendar>
+
+</div>
