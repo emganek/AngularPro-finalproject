@@ -3,7 +3,7 @@
     "rules": "database.rules.json"
   },
   "hosting": {
-    "source": "/",
+    "public": "dist/ulti-project",
     "ignore": [
       ".firebaserc",
       ".vscode",

@@ -1,7 +1,4 @@
 <div>
-  Hello Ultimate Angular 2!
-  <div>{{ user$ | async | json }}</div>
-  <button (click)="onLogout()">Sign Out</button>
   <app-header [user]="user$ | async" (logout)="onLogout()"> </app-header>
   <app-nav *ngIf="(user$ | async)"> </app-nav>
   <div class="wrapper">
