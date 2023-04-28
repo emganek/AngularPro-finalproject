@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { onValue, query, ref, startAt as sstartAt, orderByChild, endAt as eendAt } from 'firebase/database';
-import { BehaviorSubject, map, Observable, Subject, switchMap, tap } from 'rxjs';
+import { onValue, query, ref, startAt as sstartAt, orderByChild, endAt as eendAt, push, set, update } from 'firebase/database';
+import { BehaviorSubject, map, Observable, Subject, switchMap, tap, withLatestFrom } from 'rxjs';
 import { fireDatabase } from 'src/app/app.module';
 import { AuthService } from 'src/app/auth/shared/services/auth.service';
 import { Store } from 'src/app/store';
@@ -27,6 +27,37 @@ export interface ScheduleList {
 export class ScheduleService {
   private date$ = new BehaviorSubject(new Date());
   private section$ = new Subject();
+  private itemList$ = new Subject();
+  items$ = this.itemList$.pipe(
+    withLatestFrom(this.section$),
+    map(([ items, section ]: any[]) => {
+
+      const id = section.data.$key;
+
+      const defaults: ScheduleItem = {
+        workouts: null!,
+        meals: null!,
+        section: section.section,
+        timestamp: new Date(section.day).getTime()
+      };
+
+      const payload = {
+        ...(id ? section.data : defaults),
+        ...items
+      };
+
+      if (id) {
+        console.log("updateeee", id);
+        return this.updateSection(id, payload);
+      } else {
+        console.log("createeeeeeeeeeee", id);
+
+        return this.createSection(payload);
+      }
+
+    })
+  )
+
   get uid() {
     return this.authService.user?.uid
   }
@@ -62,12 +93,12 @@ export class ScheduleService {
       console.log("dataaaaaaaaaaaaaaaaaaaa", data);
       const mapped: ScheduleList = {};
 
-      for (const prop of data) {
-        if (!mapped[prop.section]) {
-          mapped[prop.section] = prop;
+      for (const prop in data) {
+        if (!mapped[data[prop].section]) {
+          mapped[data[prop].section] = data[prop];
         }
       }
-
+      console.log("mapped", mapped)
       return mapped;
 
     }),
@@ -80,13 +111,19 @@ export class ScheduleService {
     this.date$.next(date);
   }
 
+  updateItems(items: string[]) {
+    this.itemList$.next(items);
+  }
+
   private async getSchedule(startAt: number, endAt: number) {
+    console.log("getSchedulelllllllll")
     const dbRef = ref(fireDatabase, `schedule/${this.uid}`);
     const myquery = query(dbRef, orderByChild('timestamp'), sstartAt(startAt), eendAt(endAt));
     const myPromise = new Promise<any[]>((resolve: any, reject: any) => {
       onValue(myquery, (snapshot) => {
-        if (!snapshot.exists()) {
-          console.log("ressultttt", snapshot.val());
+        console.log("snappppppppppppppppp", snapshot.exists());
+        if (snapshot.exists()) {
+          console.log("schedule snapshotttttttttttttttt", snapshot.val());
           resolve(snapshot.val() === null ? [] : snapshot.val());
         } else {
           resolve([]);
@@ -99,28 +136,18 @@ export class ScheduleService {
     return result;
   }
 
-
-  getMeals() {
-    const dbRef = ref(fireDatabase, `meals/${this.uid}`);
-    return onValue(dbRef, (snapshot) => {
-      if (!snapshot.exists()) {
-        this.store.set('meals', []);
-      } else {
-        let tempArr: Meal[] = [];
-        snapshot.forEach((ele: any) => {
-          const item = { ...ele.val(), $key: ele.key }
-          tempArr.push(item);
-        });
-        console.log("tempArr", tempArr)
-        this.store.set('meals', tempArr);
-      }
-    }, {
-      onlyOnce: false
-    });
-  }
-
   selectSection(event: any) {
     this.section$.next(event);
   }
 
+  private createSection(payload: ScheduleItem) {
+    const postListRef = ref(fireDatabase,`schedule/${this.uid}`);
+    const newPostRef = push(postListRef);
+    return set(newPostRef, payload);
+  }
+
+  private updateSection(key: string, payload: ScheduleItem) {
+    const postListRef = ref(fireDatabase, `schedule/${this.uid}/${key}`);
+    return update(postListRef, payload);
+  }
 }

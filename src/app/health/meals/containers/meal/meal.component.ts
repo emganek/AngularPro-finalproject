@@ -30,8 +30,8 @@ export class MealComponent implements OnInit, OnDestroy {
   }
 
   async addMeal(event: Meal) {
-    const hiep = await this.mealsService.addMeal(event);
-    console.log("meal added feedback", hiep);
+    const addedMeal = await this.mealsService.addMeal(event);
+    console.log("meal added feedback", addedMeal);
     this.backToMeals();
   }
 
