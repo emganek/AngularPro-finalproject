@@ -18,11 +18,6 @@ export class ScheduleSectionComponent {
 
   onSelect(type: string, assigned: any[] = []) {
     const data = this.section;
-    console.log('select on Section', {
-      type,
-      assigned,
-      data,
-    });
     this.select.emit({
       type,
       assigned,

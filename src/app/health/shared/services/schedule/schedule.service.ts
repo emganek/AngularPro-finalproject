@@ -12,7 +12,7 @@ export interface ScheduleItem {
   workouts: Workout[],
   section: string,
   timestamp: number,
-  $key?: string
+  key?: string
 }
 
 export interface ScheduleList {
@@ -30,10 +30,9 @@ export class ScheduleService {
   private itemList$ = new Subject();
   items$ = this.itemList$.pipe(
     withLatestFrom(this.section$),
-    map(([ items, section ]: any[]) => {
+    map(async ([items, section]: any[]) => {
 
-      const id = section.data.$key;
-      console.log("sectionnnnnnnn", section);
+      const id = section.data.key;
       const defaults: ScheduleItem = {
         workouts: null!,
         meals: null!,
@@ -47,12 +46,11 @@ export class ScheduleService {
       };
 
       if (id) {
-        console.log("updateeee", id);
         return this.updateSection(id, payload);
       } else {
-        console.log("createeeeeeeeeeee", id);
 
-        return this.createSection(payload);
+        const result = this.createSection(payload);
+        return result;
       }
 
     })
@@ -74,7 +72,6 @@ export class ScheduleService {
   schedule$: any = this.date$.pipe(
     tap((next: any) => {
       this.store.set('date', next);
-      console.log("time", next);
     }),
     map((day: any) => {
 
@@ -88,21 +85,7 @@ export class ScheduleService {
 
       return { startAt, endAt };
     }),
-    switchMap(({ startAt, endAt }: any) => this.getSchedule(startAt, endAt)),
-    map((data: any) => {
-      console.log("settttttt schedule", data);
-      const mapped: ScheduleList = {};
-
-      for (const prop in data) {
-        if (!mapped[data[prop].section]) {
-          mapped[data[prop].section] = data[prop];
-        }
-      }
-      console.log("mapped", mapped)
-      return mapped;
-
-    }),
-    tap((next: any) => this.store.set('schedule', next))
+    switchMap(({ startAt, endAt }: any) => this.getSchedule(startAt, endAt))
   );
 
   constructor(private store: Store, private authService: AuthService) { }
@@ -116,33 +99,35 @@ export class ScheduleService {
   }
 
   private async getSchedule(startAt: number, endAt: number) {
-    console.log("getSchedulelllllllll")
     const dbRef = ref(fireDatabase, `schedule/${this.uid}`);
     const myquery = query(dbRef, orderByChild('timestamp'), sstartAt(startAt), eendAt(endAt));
-    const myPromise = new Promise<any[]>((resolve: any, reject: any) => {
-      onValue(myquery, (snapshot) => {
-        if (snapshot.exists()) {
-          console.log("getSchedule snapshotttttttttttttttt", snapshot.val());
-          resolve(snapshot.val() === null ? [] : snapshot.val());
-        } else {
-          resolve([]);
+    onValue(myquery, (snapshot) => {
+      let result: any = {}
+      if (snapshot.exists()) {
+        result = snapshot.val() === null ? [] : snapshot.val();
+      }
+      const mapped: ScheduleList = {};
+
+      for (const prop in result) {
+        if (!mapped[result[prop].section]) {
+          mapped[result[prop].section] = { ...result[prop], key: prop };
         }
-      }, {
-        onlyOnce: false
-      });
+      }
+      this.store.set('schedule', mapped)
+    }, {
+      onlyOnce: false
     });
-    const result = await myPromise;
-    return result;
   }
 
   selectSection(event: any) {
     this.section$.next(event);
   }
 
-  private createSection(payload: ScheduleItem) {
-    const postListRef = ref(fireDatabase,`schedule/${this.uid}`);
+  private async createSection(payload: ScheduleItem) {
+    const postListRef = ref(fireDatabase, `schedule/${this.uid}`);
     const newPostRef = push(postListRef);
-    return set(newPostRef, payload);
+    const result = await set(newPostRef, payload);
+    return result
   }
 
   private updateSection(key: string, payload: ScheduleItem) {
