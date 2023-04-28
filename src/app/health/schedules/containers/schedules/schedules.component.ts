@@ -44,12 +44,13 @@ export class SchedulesComponent implements OnInit, OnDestroy {
   }
 
   changeSection(event: any) {
-    console.log("event", event)
+    console.log("changeSection", event)
     this.open = true;
     this.scheduleService.selectSection(event);
   }
 
   assignItem(items: string[]) {
+    console.log("assignItem", items);
     this.scheduleService.updateItems(items);
     this.closeAssign();
   }

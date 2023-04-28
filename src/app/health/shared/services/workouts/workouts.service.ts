@@ -37,7 +37,6 @@ export class WorkoutsService {
           const item = { ...ele.val(), $key: ele.key }
           tempArr.push(item);
         });
-        console.log("tempArr", tempArr)
         this.store.set('workouts', tempArr);
       }
     }, {

@@ -4,7 +4,7 @@ import { ScheduleItem } from 'src/app/health/shared/services/schedule/schedule.s
 @Component({
   selector: 'schedule-section',
   templateUrl: './schedule-section.component.html',
-  styleUrls: ['./schedule-section.component.scss']
+  styleUrls: ['./schedule-section.component.scss'],
 })
 export class ScheduleSectionComponent {
   @Input()
@@ -18,10 +18,15 @@ export class ScheduleSectionComponent {
 
   onSelect(type: string, assigned: any[] = []) {
     const data = this.section;
+    console.log('select on Section', {
+      type,
+      assigned,
+      data,
+    });
     this.select.emit({
       type,
       assigned,
-      data
+      data,
     });
   }
 }

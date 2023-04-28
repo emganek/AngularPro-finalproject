@@ -33,7 +33,7 @@ export class ScheduleService {
     map(([ items, section ]: any[]) => {
 
       const id = section.data.$key;
-
+      console.log("sectionnnnnnnn", section);
       const defaults: ScheduleItem = {
         workouts: null!,
         meals: null!,
@@ -90,7 +90,7 @@ export class ScheduleService {
     }),
     switchMap(({ startAt, endAt }: any) => this.getSchedule(startAt, endAt)),
     map((data: any) => {
-      console.log("dataaaaaaaaaaaaaaaaaaaa", data);
+      console.log("settttttt schedule", data);
       const mapped: ScheduleList = {};
 
       for (const prop in data) {
@@ -121,9 +121,8 @@ export class ScheduleService {
     const myquery = query(dbRef, orderByChild('timestamp'), sstartAt(startAt), eendAt(endAt));
     const myPromise = new Promise<any[]>((resolve: any, reject: any) => {
       onValue(myquery, (snapshot) => {
-        console.log("snappppppppppppppppp", snapshot.exists());
         if (snapshot.exists()) {
-          console.log("schedule snapshotttttttttttttttt", snapshot.val());
+          console.log("getSchedule snapshotttttttttttttttt", snapshot.val());
           resolve(snapshot.val() === null ? [] : snapshot.val());
         } else {
           resolve([]);

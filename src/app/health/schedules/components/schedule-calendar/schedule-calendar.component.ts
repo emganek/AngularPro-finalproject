@@ -19,7 +19,6 @@ export class ScheduleCalendarComponent implements OnInit, OnChanges {
 
   @Input() set date(date: Date){
     this.selectedDay = date;
-    console.log("newDate", new Date(date.getDate()));
   }
   
   
